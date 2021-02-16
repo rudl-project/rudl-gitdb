@@ -1,0 +1,4 @@
+<?php
+
+define("DATA_PATH", "%DATA_PATH?/data%");
+define("REPO_GIT_URL", "%REPO_GIT_URL%");

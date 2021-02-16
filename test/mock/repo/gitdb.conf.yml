@@ -1,0 +1,18 @@
+version: 1
+systems:
+  - name: cert_issuer
+    accessKeysHash:
+      - "$6$dDJQR4gEoVEil$1Nwe94UNyabtHTt4uxrafohjazPH51/q3HP0iGjSqBROfZIZr2yDPUMCZRSzwu4RLig1E6qk4dIyaKXTOb/8X0"
+      # Password: test
+  - name: cert_reader
+    accessKeysHash:
+    - "$6$dDJQR4gEoVEil$1Nwe94UNyabtHTt4uxrafohjazPH51/q3HP0iGjSqBROfZIZr2yDPUMCZRSzwu4RLig1E6qk4dIyaKXTOb/8X0"
+      # Password: test
+
+scopes:
+  - name: certs
+    allowRead:
+      - cert_issuer
+      - cert_reader
+    allowWrite:
+      - cert_issuer

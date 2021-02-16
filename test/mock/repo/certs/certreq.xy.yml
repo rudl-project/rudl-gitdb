@@ -1,0 +1,5 @@
+name: xy
+autoissue: true
+hosts:
+  - "www.xy.de"
+  - "xy.de"
