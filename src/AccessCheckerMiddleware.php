@@ -18,6 +18,11 @@ class AccessCheckerMiddleware extends BraceAbstractMiddleware
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // Routes with no authentication
+        if (str_starts_with($request->getUri()->getPath(), "/hooks/repo")) {
+            return $handler->handle($request);
+        }
+
 
         $routeParams = $this->app->routeParams;
         if ( ! $routeParams instanceof RouteParams)

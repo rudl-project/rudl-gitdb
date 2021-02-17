@@ -14,6 +14,8 @@ use Phore\VCS\VcsRepository;
 use Psr\Http\Message\RequestInterface;
 use Rudl\GitDb\AccessChecker;
 use Rudl\GitDb\ObjectAccessor;
+use Rudl\LibGitDb\Type\Transport\T_Object;
+use Rudl\LibGitDb\Type\Transport\T_ObjectList;
 
 AppLoader::extend(function (BraceApp $app) {
     $app->router->onGet("/hooks/repo", function (VcsRepository $vcsRepository) {
@@ -23,22 +25,29 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->onGet(
         "/api/o/:scopeName",
-        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, BasicAuthToken $basicAuthToken) {
-            $validator = new AccessChecker($objectAccessor->loadConfig());
+        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, VcsRepository $vcsRepository) {
+            if ( ! $vcsRepository->exists())
+                throw new \InvalidArgumentException("Repository not cloned");
+
             $reqScope = $routeParams->get("scopeName");
 
-            $validator->validateSystem($basicAuthToken->user , $basicAuthToken->passwd);
-            $validator->hasReadAccess($basicAuthToken->user, $reqScope);
-
-            return new Response\JsonResponse(
-                $objectAccessor->getFileList($reqScope)
-            );
+            return (array)$objectAccessor->getFileList($reqScope);
         }
     );
 
     $app->router->onPost(
         "/api/o/:scopeName",
-        function (ObjectAccessor $objectAccessor, RouteParams $routeParams, BasicAuthToken $basicAuthToken) {
-            $validator = new AccessChecker($objectAccessor->loadConfig());
+        function (ObjectAccessor $objectAccessor, RouteParams $routeParams, T_ObjectList $body, VcsRepository $vcsRepository) {
+            if ( ! $vcsRepository->exists())
+                throw new \InvalidArgumentException("Repository not cloned");
+            $reqScope = $routeParams->get("scopeName");
+
+            $body->objects = array_filter($body->objects, function (T_Object $in) {
+
+            });
+
+            $objectAccessor->writeFileList($reqScope, $body);
+
+            return ["success" => true, "written_files" => count($body->objects)];
         });
 });

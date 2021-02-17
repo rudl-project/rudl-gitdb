@@ -3,6 +3,7 @@ namespace App;
 
 
 use Brace\Auth\Basic\AuthBasicMiddleware;
+use Brace\Body\BodyMiddleware;
 use Brace\Core\AppLoader;
 use Brace\Core\Base\ExceptionHandlerMiddleware;
 use Brace\Core\Base\JsonReturnFormatter;
@@ -39,6 +40,7 @@ AppLoader::extend(function (BraceApp $app) {
         new ExceptionHandlerMiddleware(),
         new RouterEvalMiddleware(),
         new AuthBasicMiddleware(),
+        new BodyMiddleware(),
         new AccessCheckerMiddleware(),
         new RouterDispatchMiddleware([
             new JsonReturnFormatter($app)

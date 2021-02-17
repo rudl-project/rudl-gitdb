@@ -19,8 +19,8 @@ command:
     - "ptest"
 
   dev:
-    - ""
+    - "curl http://localhost/hooks/repo"
 
   run:
-
+    - "curl http://localhost/hooks/repo"
 
