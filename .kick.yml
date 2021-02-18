@@ -17,7 +17,7 @@ command:
     - "sudo chown -R www-data $DATA_PATH"
   test:
     - "curl http://localhost/hooks/repo"
-    - "/vendor/bin/ptest"
+    - "/opt/vendor/bin/ptest"
 
   dev:
     - "curl http://localhost/hooks/repo"
