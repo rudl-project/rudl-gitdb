@@ -22,10 +22,14 @@ class ObjectAccessor
         $this->rootDir = phore_dir($rootDir)->assertDirectory();
     }
 
-    public function getFileList($scope) : T_ObjectList
+    public function getObjectList($scope) : T_ObjectList
     {
         $fileList = [];
-        $scopeDir = $this->rootDir->withSubPath($scope)->assertDirectory();
+        $scopeDir = $this->rootDir->withSubPath($scope);
+        if ( ! $scopeDir->exists())
+            return new T_ObjectList();
+        $scopeDir = $scopeDir->assertDirectory();
+
         foreach ($scopeDir->genWalk() as $file) {
             $fileList[] = $file;
         }
@@ -39,7 +43,7 @@ class ObjectAccessor
         $response = new T_ObjectList();
         foreach ($fileList as $file) {
             $respFile = new T_Object();
-            $respFile->filename = $file->getFilename();
+            $respFile->name = $file->getFilename();
             $respFile->content = $file->assertFile()->get_contents();
             $response->objects[] = $respFile;
         }

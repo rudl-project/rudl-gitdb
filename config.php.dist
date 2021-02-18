@@ -1,4 +1,11 @@
 <?php
 
+define("DEV_MODE", (bool)"%DEV_MODE?0%");
+
 define("DATA_PATH", "%DATA_PATH?/data%");
 define("REPO_GIT_URL", "%REPO_GIT_URL%");
+
+define("KEYVAULT_SECRET", "%KEYVAULT_SECRET%");
+define("KEYVAULT_KEY_ID", "default");
+
+define("DEV_SKIP_PUSH", (bool)"%DEV_SKIP_PUSH?0%");

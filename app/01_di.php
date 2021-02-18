@@ -16,15 +16,22 @@ use Brace\Router\RouterModule;
 use Phore\Di\Container\Producer\DiService;
 use Phore\Di\Container\Producer\DiValue;
 use Phore\VCS\VcsFactory;
+use Rudl\GitDb\AccessChecker;
 use Rudl\GitDb\AccessCheckerMiddleware;
 use Rudl\GitDb\ObjectAccessor;
+use Rudl\Vault\Lib\Config;
+use Rudl\Vault\Lib\KeyVault;
 
 
 AppLoader::extend(function (BraceApp $app) {
+    $app->addModule(new BraceRequestLaminasModule());
+    $app->addModule(new RouterModule());
+
     $app->define("objectAccessor", new DiValue(new ObjectAccessor(DATA_PATH)));
 
     $app->define("vcsFactory", new DiService(function () {
         $vcsF =  new VcsFactory();
+        $vcsF->setCommitUser("rudl-gitdb", "rudl@infracamp.org");
         return $vcsF;
     }));
 
@@ -33,18 +40,17 @@ AppLoader::extend(function (BraceApp $app) {
         return $repo;
     }));
 
+    $app->define("keyVault", new DiService(function () {
+        $rudlVaultConfig = new Config();
+        $rudlVaultConfig->load( DATA_PATH . "/.rudl-vault.json");
+        $keyVault =  new KeyVault($rudlVaultConfig);
+        return $keyVault;
+    }));
 
-    $app->addModule(new BraceRequestLaminasModule());
-    $app->addModule(new RouterModule());
-    $app->setPipe([
-        new ExceptionHandlerMiddleware(),
-        new RouterEvalMiddleware(),
-        new AuthBasicMiddleware(),
-        new BodyMiddleware(),
-        new AccessCheckerMiddleware(),
-        new RouterDispatchMiddleware([
-            new JsonReturnFormatter($app)
-        ]),
-        new NotFoundMiddleware()
-    ]);
+    $app->define("accessChecker", new DiService(function (ObjectAccessor $objectAccessor) {
+        return new AccessChecker($objectAccessor->loadConfig());
+    }));
+
+
+
 });

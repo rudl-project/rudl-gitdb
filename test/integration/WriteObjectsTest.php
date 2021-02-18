@@ -18,7 +18,7 @@ class WriteObjectsTest extends TestCase
 
         $objectList = new T_ObjectList([
             new T_Object("some.crt.pem", "ABC"),
-            new T_Object("other.object", "DEF")
+            new T_Object("other.object", "DEF", true)
         ]);
 
         $lib->writeObjects("certs", $objectList);

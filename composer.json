@@ -17,6 +17,7 @@
         "brace/mod-request-laminas": "*",
         "brace/mod-auth-basic": "*",
         "brace/mod-router": "*",
+        "brace/mod-firewall": "*",
         "brace/mod-body": "*",
         "rudl/gitdb-lib": "*",
         "rudl/vault": "*",

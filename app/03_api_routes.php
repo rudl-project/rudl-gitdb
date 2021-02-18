@@ -16,38 +16,77 @@ use Rudl\GitDb\AccessChecker;
 use Rudl\GitDb\ObjectAccessor;
 use Rudl\LibGitDb\Type\Transport\T_Object;
 use Rudl\LibGitDb\Type\Transport\T_ObjectList;
+use Rudl\Vault\Lib\Format\MultilineFormat;
+use Rudl\Vault\Lib\KeyLoader\CallbackKeyLoader;
+use Rudl\Vault\Lib\KeyVault;
 
 AppLoader::extend(function (BraceApp $app) {
-    $app->router->onGet("/hooks/repo", function (VcsRepository $vcsRepository) {
+    $app->router->on("GET@/hooks/repo", function (VcsRepository $vcsRepository) {
         $vcsRepository->pull();
         return ["success" => true];
     });
 
-    $app->router->onGet(
-        "/api/o/:scopeName",
-        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, VcsRepository $vcsRepository) {
+    $app->router->on("GET|POST@/hooks/trigger", function (VcsRepository $vcsRepository, array $body) {
+        phore_dir($vcsRepository->getLocalRepoPath())->withFileName("trigger_last.yml")->set_yaml([
+            "date" => date("Y-m-d H:i:s"),
+            "body" => $body
+        ]);
+        $vcsRepository->commit("Trigger pulled.");
+        if ( ! DEV_SKIP_PUSH) {
+            $vcsRepository->push();
+        }
+    });
+
+    $app->router->on("GET@/api/revision", function (VcsRepository $vcsRepository) {
+        return new Response\TextResponse($vcsRepository->getRev());
+    });
+
+    $app->router->on(
+        "GET@/api/o/:scopeName",
+        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, VcsRepository $vcsRepository, KeyVault $keyVault) {
+
             if ( ! $vcsRepository->exists())
                 throw new \InvalidArgumentException("Repository not cloned");
 
             $reqScope = $routeParams->get("scopeName");
 
-            return (array)$objectAccessor->getFileList($reqScope);
+            $objectList = $objectAccessor->getObjectList($reqScope);
+
+
+            $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) {
+                $keyVault->unlockKey($keyId, KEYVAULT_SECRET);
+            }));
+            $objectList->objects = array_filter($objectList->objects, function (T_Object $in) use ($filter) {
+                $in->content = $filter->decode($in->content);
+                return $in;
+            });
+            $objectList->rev = $vcsRepository->getRev();
+            return (array)$objectList;
         }
     );
 
-    $app->router->onPost(
-        "/api/o/:scopeName",
-        function (ObjectAccessor $objectAccessor, RouteParams $routeParams, T_ObjectList $body, VcsRepository $vcsRepository) {
+    $app->router->on(
+        "POST@/api/o/:scopeName",
+        function (RequestInterface $request, ObjectAccessor $objectAccessor, RouteParams $routeParams, BasicAuthToken $basicAuthToken, T_ObjectList $body, VcsRepository $vcsRepository, KeyVault $keyVault) {
             if ( ! $vcsRepository->exists())
                 throw new \InvalidArgumentException("Repository not cloned");
             $reqScope = $routeParams->get("scopeName");
 
-            $body->objects = array_filter($body->objects, function (T_Object $in) {
-
+            $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) {
+                return KEYVAULT_SECRET;
+            }));
+            $body->objects = array_filter($body->objects, function (T_Object $in) use ($filter) {
+                $in->content = $filter->encode($in->content, KEYVAULT_KEY_ID);
+                return $in;
             });
 
-            $objectAccessor->writeFileList($reqScope, $body);
 
+            $objectAccessor->writeFileList($reqScope, $body);
+            $vcsRepository->commit("Scope update '$reqScope' from system '{$basicAuthToken->user}'");
+            if ( ! DEV_SKIP_PUSH) {
+                $vcsRepository->pull();
+                $vcsRepository->push();
+            }
             return ["success" => true, "written_files" => count($body->objects)];
         });
 });
