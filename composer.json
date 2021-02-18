@@ -20,7 +20,7 @@
         "brace/mod-firewall": "*",
         "brace/mod-body": "*",
         "rudl/gitdb-lib": "*",
-        "rudl/vault": "*",
+        "rudl/vault": "dev-master",
         "phore/vcs": "*",
         "phore/filesystem": "dev-master",
         "phore/hydrator": "*"
