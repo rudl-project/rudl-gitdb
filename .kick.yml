@@ -16,7 +16,8 @@ command:
     - "sudo mkdir -p $DATA_PATH"
     - "sudo chown -R www-data $DATA_PATH"
   test:
-    - "ptest"
+    - "curl http://localhost/hooks/repo"
+    - "/vendor/bin/ptest"
 
   dev:
     - "curl http://localhost/hooks/repo"
