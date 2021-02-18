@@ -3,4 +3,4 @@
 docker build --build-arg DOCKER_TAG=$DOCKER_TAG -f $DOCKERFILE_PATH -t $IMAGE_NAME .
 
 ## Run Selftest before push
-docker run -t -v "$PWD/:/opt/" -e DEV_MODE=1 --env-file .env $IMAGE_NAME test
+docker run -t -e DEV_MODE=1 --env-file .env $IMAGE_NAME test
