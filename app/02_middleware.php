@@ -34,7 +34,7 @@ AppLoader::extend(function (BraceApp $app) {
                 return true;
             },
             "GET@/api/o/:scopeName" => function(AccessChecker $accessChecker, BasicAuthToken $basicAuthToken, RouteParams $routeParams) {
-                $accessChecker->validateWriteAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
+                $accessChecker->validateReadAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
                 return true;
             }
         ]
