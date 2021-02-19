@@ -43,7 +43,7 @@ class ObjectAccessor
         $response = new T_ObjectList();
         foreach ($fileList as $file) {
             $respFile = new T_Object();
-            $respFile->name = $file->getFilename();
+            $respFile->name = $file->getBasename();
             $respFile->content = $file->assertFile()->get_contents();
             $response->objects[] = $respFile;
         }
