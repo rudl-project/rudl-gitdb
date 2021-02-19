@@ -1,5 +1,6 @@
 FROM nfra/kickstart-flavor-php:unstable
 ENV DEV_CONTAINER_NAME="your-project-name"
+ENV DATA_PATH="/data"
 
 ADD / /opt
 RUN ["bash", "-c",  "chown -R user /opt"]

@@ -68,20 +68,22 @@ AppLoader::extend(function (BraceApp $app) {
             $reqScope = $routeParams->get("scopeName");
 
             $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) {
-                return KEYVAULT_SECRET;
             }));
+
             $body->objects = array_filter($body->objects, function (T_Object $in) use ($filter) {
                 $in->content = $filter->encode($in->content, KEYVAULT_KEY_ID);
                 return $in;
             });
 
-
-            $objectAccessor->writeFileList($reqScope, $body);
-            $vcsRepository->commit("Scope update '$reqScope' from system '{$basicAuthToken->user}'");
-            if ( ! DEV_SKIP_PUSH) {
-                $vcsRepository->pull();
-                $vcsRepository->push();
+            if ($request->getUri()->getQuery() !== "simulate") {
+                $objectAccessor->writeFileList($reqScope, $body);
+                $vcsRepository->commit("Scope update '$reqScope' from system '{$basicAuthToken->user}'");
+                if ( ! DEV_SKIP_PUSH) {
+                    $vcsRepository->pull();
+                    $vcsRepository->push();
+                }
             }
+
             return ["success" => true, "written_files" => count($body->objects)];
         });
 });
