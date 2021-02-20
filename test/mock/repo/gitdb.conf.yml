@@ -1,5 +1,5 @@
 version: 1
-systems:
+clients:
   - name: cert_issuer
     accessKeysHash:
       - "$6$dDJQR4gEoVEil$1Nwe94UNyabtHTt4uxrafohjazPH51/q3HP0iGjSqBROfZIZr2yDPUMCZRSzwu4RLig1E6qk4dIyaKXTOb/8X0"

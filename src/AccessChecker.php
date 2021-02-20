@@ -6,6 +6,7 @@ namespace Rudl\GitDb;
 
 use Rudl\GitDb\Ex\AccessDeniedException;
 use Rudl\GitDb\Ex\AuthFailedException;
+use Rudl\LibGitDb\Type\Conf\T_ClientConfig;
 use Rudl\LibGitDb\Type\Conf\T_GitDbConfig;
 use Rudl\LibGitDb\Type\Conf\T_ScopeConfig;
 use Rudl\LibGitDb\Type\Conf\T_SystemConfig;
@@ -26,51 +27,51 @@ class AccessChecker
         throw new \InvalidArgumentException("Scope '$name' not found in config.");
     }
 
-    public function getSystemConfig(string $name) : T_SystemConfig
+    public function getClientConfig(string $name) : T_ClientConfig
     {
-        foreach ($this->config->systems as $system) {
-            if ($system->name === $name)
-                return $system;
+        foreach ($this->config->clients as $client) {
+            if ($client->name === $name)
+                return $client;
         }
-        throw new \InvalidArgumentException("System '$name' not found in config.");
+        throw new \InvalidArgumentException("ClientId '$name' not found in config.");
     }
 
-    public function validateSystem(string $systemName, string $authToken) : void
+    public function validateSystem(string $clientId, string $clientSecret) : void
     {
-        $system = $this->getSystemConfig($systemName);
-        foreach ($system->accessKeysHash as $hash) {
-            if (password_verify($authToken, $hash)) {
+        $clientConfig = $this->getClientConfig($clientId);
+        foreach ($clientConfig->accessKeysHash as $hash) {
+            if (password_verify($clientSecret, $hash)) {
                 return;
             }
         }
-        throw new AuthFailedException("Invalid token for system '$systemName'");
+        throw new AuthFailedException("Invalid token for clientId '$clientId'");
     }
 
-    public function hasReadAccess(string $systemName, string $scopeName) : bool
+    public function hasReadAccess(string $clientId, string $scopeName) : bool
     {
         $scope = $this->getScopeConfig($scopeName);
-        return in_array($systemName, $scope->allowRead);
+        return in_array($clientId, $scope->allowRead);
     }
 
-    public function hasWriteAccess(string $systemName, string $scopeName) : bool
+    public function hasWriteAccess(string $clientId, string $scopeName) : bool
     {
         $scope = $this->getScopeConfig($scopeName);
-        return in_array($systemName, $scope->allowWrite);
+        return in_array($clientId, $scope->allowWrite);
     }
 
-    public function validateReadAccess(string $systemName, string $authToken, string $scopeName)
+    public function validateReadAccess(string $clientId, string $authToken, string $scopeName)
     {
-        $this->validateSystem($systemName, $authToken);
-        if ($this->hasReadAccess($systemName, $scopeName))
+        $this->validateSystem($clientId, $authToken);
+        if ($this->hasReadAccess($clientId, $scopeName))
             return true;
-        throw new AccessDeniedException("Read access denied for system '$systemName' to scope '$scopeName'");
+        throw new AccessDeniedException("Read access denied for clientId '$clientId' to scope '$scopeName'");
     }
 
-    public function validateWriteAccess(string $systemName, string $authToken, string $scopeName)
+    public function validateWriteAccess(string $clientId, string $authToken, string $scopeName)
     {
-        $this->validateSystem($systemName, $authToken);
-        if ($this->hasWriteAccess($systemName, $scopeName))
+        $this->validateSystem($clientId, $authToken);
+        if ($this->hasWriteAccess($clientId, $scopeName))
             return true;
-        throw new AccessDeniedException("Write access denied for system '$systemName' to scope '$scopeName'");
+        throw new AccessDeniedException("Write access denied for clientId '$clientId' to scope '$scopeName'");
     }
 }
