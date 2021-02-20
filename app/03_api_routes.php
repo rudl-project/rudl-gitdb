@@ -11,13 +11,28 @@ use Psr\Http\Message\RequestInterface;
 use Rudl\GitDb\ObjectAccessor;
 use Rudl\LibGitDb\Type\Transport\T_Object;
 use Rudl\LibGitDb\Type\Transport\T_ObjectList;
+use Rudl\Vault\Lib\Config;
 use Rudl\Vault\Lib\Format\MultilineFormat;
 use Rudl\Vault\Lib\KeyLoader\CallbackKeyLoader;
 use Rudl\Vault\Lib\KeyVault;
 
 AppLoader::extend(function (BraceApp $app) {
-    $app->router->on("GET@/hooks/repo", function (VcsRepository $vcsRepository) {
+
+
+
+    $app->router->on("GET@/hooks/repo", function (VcsRepository $vcsRepository) use ($app) {
         $vcsRepository->pull();
+        $rudlVaultFile = DATA_PATH . "/.rudl-vault.json";
+        if ( file_exists($rudlVaultFile)) {
+            $rudlVault = new KeyVault($config = new Config());
+            $config->createNew($rudlVaultFile);
+            $rudlVault->createKeyPair(RUDL_VAULT_KEY_ID, $app->rudlVaultSecret);
+            $config->save();
+            $vcsRepository->commit("created .rudl-vault.json");
+            if ( ! DEV_SKIP_PUSH) {
+                $vcsRepository->push();
+            }
+        }
         return ["success" => true];
     });
 
@@ -38,7 +53,7 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on(
         "GET@/api/o/:scopeName",
-        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, VcsRepository $vcsRepository, KeyVault $keyVault) {
+        function(ObjectAccessor $objectAccessor, RouteParams $routeParams, VcsRepository $vcsRepository, KeyVault $keyVault) use ($app) {
 
             if ( ! $vcsRepository->exists())
                 throw new \InvalidArgumentException("Repository not cloned");
@@ -47,16 +62,8 @@ AppLoader::extend(function (BraceApp $app) {
 
             $objectList = $objectAccessor->getObjectList($reqScope);
 
-
-            $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) {
-                $secret = RUDL_VAULT_SECRET;
-                if (preg_match ("|^file:(.*)?|", $secret, $matches)) {
-                    $secretFile = $matches[1];
-                    if ( ! file_exists($secretFile) || ! is_readable($secretFile))
-                        throw new \InvalidArgumentException("Cannot read rudl vault secret file: '$secretFile'.");
-                    $secret = file_get_contents($secretFile);
-                }
-                $keyVault->unlockKey($keyId, $secret);
+            $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) use ($app) {
+                $keyVault->unlockKey($keyId, $app->rudlVaultSecret);
             }));
             $objectList->objects = array_filter($objectList->objects, function (T_Object $in) use ($filter) {
                 $in->content = $filter->decode($in->content);
@@ -78,7 +85,7 @@ AppLoader::extend(function (BraceApp $app) {
             }));
 
             $body->objects = array_filter($body->objects, function (T_Object $in) use ($filter) {
-                $in->content = $filter->encode($in->content, KEYVAULT_KEY_ID);
+                $in->content = $filter->encode($in->content, RUDL_VAULT_KEY_ID);
                 return $in;
             });
 

@@ -15,6 +15,7 @@ use Brace\Router\RouterEvalMiddleware;
 use Brace\Router\RouterModule;
 use Phore\Di\Container\Producer\DiService;
 use Phore\Di\Container\Producer\DiValue;
+use Phore\VCS\Git\SshGitRepository;
 use Phore\VCS\VcsFactory;
 use Rudl\GitDb\AccessChecker;
 use Rudl\GitDb\AccessCheckerMiddleware;
@@ -29,6 +30,18 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->define("objectAccessor", new DiValue(new ObjectAccessor(DATA_PATH)));
 
+
+    $app->define("rudlVaultSecret", new DiService(function () {
+        $secret = RUDL_VAULT_SECRET;
+        if (preg_match ("|^file:(.*)?|", $secret, $matches)) {
+            $secretFile = $matches[1];
+            if ( ! file_exists($secretFile) || ! is_readable($secretFile))
+                throw new \InvalidArgumentException("Cannot read rudl vault secret file: '$secretFile'.");
+            $secret = file_get_contents($secretFile);
+        }
+        return $secret;
+    }));
+
     $app->define("vcsFactory", new DiService(function () {
         $vcsF =  new VcsFactory();
         $vcsF->setCommitUser("rudl-gitdb", "rudl@infracamp.org");
@@ -37,6 +50,9 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->define("vcsRepository", new DiService(function (VcsFactory $vcsFactory) {
         $repo = $vcsFactory->repository(DATA_PATH, GIT_REPO_URL);
+        if ($repo instanceof SshGitRepository) {
+            $repo->setSshPrivateKey(GIT_REPO_SSH_KEY);
+        }
         return $repo;
     }));
 
