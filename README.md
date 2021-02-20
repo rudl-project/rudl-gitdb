@@ -14,8 +14,8 @@ Rudl GitDb Microservice
 
 | Name       | Default      | Description     |
 |------------|--------------|-----------------|
-| REPO_GIT_URL      |
-| KEYVAULT_SECRET   |
+| GIT_REPO_URL      |
+| RUDL_VAULT_SECRET   |
 
 
 

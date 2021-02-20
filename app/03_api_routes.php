@@ -49,7 +49,14 @@ AppLoader::extend(function (BraceApp $app) {
 
 
             $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) {
-                $keyVault->unlockKey($keyId, KEYVAULT_SECRET);
+                $secret = RUDL_VAULT_SECRET;
+                if (preg_match ("|^file:(.*)?|", $secret, $matches)) {
+                    $secretFile = $matches[1];
+                    if ( ! file_exists($secretFile) || ! is_readable($secretFile))
+                        throw new \InvalidArgumentException("Cannot read rudl vault secret file: '$secretFile'.");
+                    $secret = file_get_contents($secretFile);
+                }
+                $keyVault->unlockKey($keyId, $secret);
             }));
             $objectList->objects = array_filter($objectList->objects, function (T_Object $in) use ($filter) {
                 $in->content = $filter->decode($in->content);

@@ -36,7 +36,7 @@ AppLoader::extend(function (BraceApp $app) {
     }));
 
     $app->define("vcsRepository", new DiService(function (VcsFactory $vcsFactory) {
-        $repo = $vcsFactory->repository(DATA_PATH, REPO_GIT_URL);
+        $repo = $vcsFactory->repository(DATA_PATH, GIT_REPO_URL);
         return $repo;
     }));
 
