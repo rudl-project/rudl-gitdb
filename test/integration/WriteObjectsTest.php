@@ -14,7 +14,8 @@ class WriteObjectsTest extends TestCase
 
     public function testWriteFiles()
     {
-        $lib = new RudlGitDbClient("http://cert_issuer:test@localhost");
+        $lib = new RudlGitDbClient();
+        $lib->setEndpointDev("http://cert_issuer:testtest@localhost");
 
         $objectList = new T_ObjectList([
             new T_Object("some.crt.pem", "ABC"),

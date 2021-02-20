@@ -12,7 +12,9 @@ class ReadObjectsTest extends TestCase
 
     public function testReadObjects()
     {
-        $lib = new RudlGitDbClient("http://cert_issuer:test@localhost");
+        $lib = new RudlGitDbClient();
+        $lib->setEndpointDev("http://cert_issuer:testtest@localhost");
+
         $objectsList = $lib->listObjects("certs");
     }
 

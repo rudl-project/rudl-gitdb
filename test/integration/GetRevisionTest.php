@@ -12,7 +12,8 @@ class GetRevisionTest extends TestCase
 
     public function testGetRevision()
     {
-        $lib = new RudlGitDbClient("http://cert_issuer:test@localhost");
+        $lib = new RudlGitDbClient();
+        $lib->setEndpointDev("http://cert_issuer:testtest@localhost");
         $this->assertEquals(40, strlen ($lib->getRevision()));
     }
 
