@@ -37,7 +37,7 @@ AppLoader::extend(function (BraceApp $app) {
             $secretFile = $matches[1];
             if ( ! file_exists($secretFile) || ! is_readable($secretFile))
                 throw new \InvalidArgumentException("Cannot read rudl vault secret file: '$secretFile'.");
-            $secret = file_get_contents($secretFile);
+            $secret = trim(file_get_contents($secretFile));
         }
         return $secret;
     }));
