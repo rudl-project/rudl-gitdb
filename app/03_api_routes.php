@@ -23,7 +23,7 @@ AppLoader::extend(function (BraceApp $app) {
     $app->router->on("GET@/hooks/repo", function (VcsRepository $vcsRepository) use ($app) {
         $vcsRepository->pull();
         $rudlVaultFile = DATA_PATH . "/.rudl-vault.json";
-        if ( file_exists($rudlVaultFile)) {
+        if ( ! file_exists($rudlVaultFile)) {
             $rudlVault = new KeyVault($config = new Config());
             $config->createNew($rudlVaultFile);
             $rudlVault->createKeyPair(RUDL_VAULT_KEY_ID, $app->rudlVaultSecret);
@@ -32,6 +32,7 @@ AppLoader::extend(function (BraceApp $app) {
             if ( ! DEV_SKIP_PUSH) {
                 $vcsRepository->push();
             }
+            return ["success" => true, "msg" => "created and pushed .rudl-vault.json (init dir)"];
         }
         return ["success" => true];
     });
