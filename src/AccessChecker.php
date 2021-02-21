@@ -44,7 +44,8 @@ class AccessChecker
                 return;
             }
         }
-        throw new AuthFailedException("Invalid token for clientId '$clientId'");
+
+        throw new AuthFailedException("Invalid token for clientId '$clientId' (Transmitted token: " . substr($clientSecret, 0, 3) . "...(". strlen($clientSecret). ")");
     }
 
     public function hasReadAccess(string $clientId, string $scopeName) : bool

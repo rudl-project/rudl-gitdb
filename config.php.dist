@@ -5,7 +5,7 @@ define("DEV_MODE", (bool)"%DEV_MODE?0%");
 define("GIT_REPO_URL", "%GIT_REPO_URL%");
 define("GIT_REPO_SSH_KEY", "%GIT_REPO_SSH_KEY?%");
 define("RUDL_VAULT_SECRET", "%RUDL_VAULT_SECRET%");
-
+define("RUDL_DEBUG_MODE", (bool)"%RUDL_DEBUG_MODE?0%");
 
 define("DATA_PATH", "%DATA_PATH?/data%");
 define("RUDL_VAULT_KEY_ID", "default");
