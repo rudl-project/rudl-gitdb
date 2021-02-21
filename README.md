@@ -19,4 +19,3 @@ Rudl GitDb Microservice
 | RUDL_VAULT_SECRET     | The secret to open the vault. (or file:/path/to/secret_file) |
 
 
-
