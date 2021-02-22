@@ -11,7 +11,6 @@ use Rudl\LibGitDb\Type\Conf\T_GitDbConfig;
 class AccessCheckerTest extends TestCase
 {
 
-
     public function testReadAccess()
     {
         $loader = new AccessChecker(
