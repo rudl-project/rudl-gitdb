@@ -18,9 +18,8 @@ use Rudl\Vault\Lib\KeyVault;
 
 AppLoader::extend(function (BraceApp $app) {
 
-
-
-    $app->router->on("GET@/hooks/repo", function (VcsRepository $vcsRepository) use ($app) {
+    // This route is used by internal startup method
+    $app->router->on("GET@/hooks/startup", $pullFn = function (VcsRepository $vcsRepository) use ($app) {
         $vcsRepository->pull();
         $rudlVaultFile = DATA_PATH . "/.rudl-vault.json";
         if ( ! file_exists($rudlVaultFile)) {
@@ -36,6 +35,9 @@ AppLoader::extend(function (BraceApp $app) {
         }
         return ["success" => true];
     });
+
+    // And this one is for external requests
+    $app->router->on("GET|POST@/hooks/repo", $pullFn);
 
     $app->router->on("GET|POST@/hooks/trigger", function (VcsRepository $vcsRepository, array $body) {
         phore_dir($vcsRepository->getLocalRepoPath())->withFileName("trigger_last.yml")->set_yaml([

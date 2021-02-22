@@ -20,8 +20,8 @@ command:
     - "/opt/vendor/bin/ptest"
 
   dev:
-    - "curl http://localhost/hooks/repo"
+    - "curl http://localhost/hooks/startup"
 
   run:
-    - "curl http://localhost/hooks/repo"
+    - "curl http://localhost/hooks/startup"
 

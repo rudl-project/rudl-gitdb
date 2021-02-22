@@ -24,9 +24,12 @@ AppLoader::extend(function (BraceApp $app) {
 
     $firewall = new FirewallMiddleware(
         [
-            "@/hooks/repo" => function (AccessChecker $accessChecker, ConnectionInfo $connectionInfo, ServerRequestInterface $request) {
+            "@/hooks/startup" => function(ConnectionInfo $connectionInfo) {
                 if ($connectionInfo->remoteAddrMatchCidr(["127.0.0.0/24"]))
                     return true;
+                return false;
+            },
+            "@/hooks/repo" => function (AccessChecker $accessChecker, ConnectionInfo $connectionInfo, ServerRequestInterface $request) {
                 $token = $request->getQueryParams()["token"];
                 if ($token === null)
                     throw new \InvalidArgumentException("Missing token query parameter ?token=");
