@@ -39,7 +39,7 @@ AppLoader::extend(function (BraceApp $app) {
     // And this one is for external requests
     $app->router->on("GET|POST@/hooks/repo", $pullFn);
 
-    $app->router->on("GET|POST@/hooks/trigger", function (VcsRepository $vcsRepository, array $body) {
+    $app->router->on("GET|POST@/hooks/trigger", function (VcsRepository $vcsRepository, string $body) {
         phore_dir($vcsRepository->getLocalRepoPath())->withFileName("trigger_last.yml")->set_yaml([
             "date" => date("Y-m-d H:i:s"),
             "body" => $body
