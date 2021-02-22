@@ -31,12 +31,14 @@ AppLoader::extend(function (BraceApp $app) {
                 if ($token === null)
                     throw new \InvalidArgumentException("Missing token query parameter ?token=");
                 $accessChecker->validateRepoHookToken($request->getQueryParams()["token"]);
+                return true;
             },
             "@/hooks/trigger" => function (AccessChecker $accessChecker, ServerRequestInterface $request) {
                 $token = $request->getQueryParams()["token"];
                 if ($token === null)
                     throw new \InvalidArgumentException("Missing token query parameter ?token=");
                 $accessChecker->validateTriggerHookToken($token);
+                return true;
             },
             "@/api/*" => function (AccessChecker $accessChecker, BasicAuthToken $basicAuthToken) {
                 $accessChecker->validateSystem($basicAuthToken->user, $basicAuthToken->passwd);
