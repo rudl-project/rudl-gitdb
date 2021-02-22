@@ -48,6 +48,7 @@ AppLoader::extend(function (BraceApp $app) {
         if ( ! DEV_SKIP_PUSH) {
             $vcsRepository->push();
         }
+        return ["success" => true, "msg" => "update triggered"];
     });
 
     $app->router->on("GET@/api/revision", function (VcsRepository $vcsRepository) {
