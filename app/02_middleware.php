@@ -5,6 +5,7 @@ namespace App;
 use Brace\Auth\Basic\AuthBasicMiddleware;
 use Brace\Auth\Basic\BasicAuthToken;
 use Brace\Body\BodyMiddleware;
+use Brace\Connection\ConnectionInfo;
 use Brace\Core\AppLoader;
 use Brace\Core\Base\ExceptionHandlerMiddleware;
 use Brace\Core\Base\JsonReturnFormatter;
@@ -16,14 +17,27 @@ use Brace\Router\RouterDispatchMiddleware;
 use Brace\Router\RouterEvalMiddleware;
 use Brace\Router\RouterModule;
 use Brace\Router\Type\RouteParams;
+use Psr\Http\Message\ServerRequestInterface;
 use Rudl\GitDb\AccessChecker;
 
 AppLoader::extend(function (BraceApp $app) {
 
     $firewall = new FirewallMiddleware(
         [
-            "@/hooks/repo" => true,
-            "@/hooks/trigger" => true,
+            "@/hooks/repo" => function (AccessChecker $accessChecker, ConnectionInfo $connectionInfo, ServerRequestInterface $request) {
+                if ($connectionInfo->remoteAddrMatchCidr(["127.0.0.0/24"]))
+                    return true;
+                $token = $request->getQueryParams()["token"];
+                if ($token === null)
+                    throw new \InvalidArgumentException("Missing token query parameter ?token=");
+                $accessChecker->validateRepoHookToken($request->getQueryParams()["token"]);
+            },
+            "@/hooks/trigger" => function (AccessChecker $accessChecker, ServerRequestInterface $request) {
+                $token = $request->getQueryParams()["token"];
+                if ($token === null)
+                    throw new \InvalidArgumentException("Missing token query parameter ?token=");
+                $accessChecker->validateTriggerHookToken($token);
+            },
             "@/api/*" => function (AccessChecker $accessChecker, BasicAuthToken $basicAuthToken) {
                 $accessChecker->validateSystem($basicAuthToken->user, $basicAuthToken->passwd);
                 return null; // Check next rules

@@ -4,6 +4,7 @@ namespace App;
 
 use Brace\Auth\Basic\AuthBasicMiddleware;
 use Brace\Body\BodyMiddleware;
+use Brace\Connection\ConnectionInfoModule;
 use Brace\Core\AppLoader;
 use Brace\Core\Base\ExceptionHandlerMiddleware;
 use Brace\Core\Base\JsonReturnFormatter;
@@ -26,6 +27,7 @@ use Rudl\Vault\Lib\KeyVault;
 
 AppLoader::extend(function (BraceApp $app) {
     $app->addModule(new BraceRequestLaminasModule());
+    $app->addModule(new ConnectionInfoModule());
     $app->addModule(new RouterModule());
 
     $app->define("objectAccessor", new DiValue(new ObjectAccessor(DATA_PATH)));

@@ -15,6 +15,7 @@
         "php": ">=8.0",
         "brace/core": "*",
         "brace/mod-request-laminas": "*",
+        "brace/mod-connection-info": "*",
         "brace/mod-auth-basic": "*",
         "brace/mod-router": "*",
         "brace/mod-firewall": "*",

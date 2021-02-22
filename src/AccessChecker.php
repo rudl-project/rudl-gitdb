@@ -75,4 +75,24 @@ class AccessChecker
             return true;
         throw new AccessDeniedException("Write access denied for clientId '$clientId' to scope '$scopeName'");
     }
+
+    public function validateRepoHookToken(string $token)
+    {
+        foreach ($this->config->repo_hook_keys as $hash) {
+            if (password_verify($token, $hash)) {
+                return;
+            }
+        }
+        throw new AccessDeniedException("Invalid token.");
+    }
+
+    public function validateTriggerHookToken(string $token)
+    {
+        foreach ($this->config->trigger_hook_keys as $hash) {
+            if (password_verify($token, $hash)) {
+                return;
+            }
+        }
+        throw new AccessDeniedException("Invalid token.");
+    }
 }
