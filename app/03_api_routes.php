@@ -86,7 +86,9 @@ AppLoader::extend(function (BraceApp $app) {
             }));
 
             $body->objects = array_filter($body->objects, function (T_Object $in) use ($filter) {
-                $in->content = $filter->encode($in->content, RUDL_VAULT_KEY_ID);
+                if ($in->encrypted === true) {
+                    $in->content = $filter->encode($in->content, RUDL_VAULT_KEY_ID);
+                }
                 return $in;
             });
 
