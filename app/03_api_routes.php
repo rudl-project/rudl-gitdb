@@ -13,6 +13,7 @@ use Rudl\LibGitDb\Type\Transport\T_Object;
 use Rudl\LibGitDb\Type\Transport\T_ObjectList;
 use Rudl\Vault\Lib\Config;
 use Rudl\Vault\Lib\Format\MultilineFormat;
+use Rudl\Vault\Lib\Format\StringFormat;
 use Rudl\Vault\Lib\KeyLoader\CallbackKeyLoader;
 use Rudl\Vault\Lib\KeyVault;
 
@@ -65,12 +66,16 @@ AppLoader::extend(function (BraceApp $app) {
             $reqScope = $routeParams->get("scopeName");
 
             $objectList = $objectAccessor->getObjectList($reqScope);
-
-            $filter = new MultilineFormat($keyVault, new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) use ($app) {
+            $keyLoader = new CallbackKeyLoader(function (string $keyId, KeyVault $keyVault) use ($app) {
                 $keyVault->unlockKey($keyId, $app->rudlVaultSecret);
-            }));
-            $objectList->objects = array_filter($objectList->objects, function (T_Object $in) use ($filter) {
-                $in->content = $filter->decode($in->content);
+            });
+
+            $filterMl = new MultilineFormat($keyVault, $keyLoader);
+            $filterSl = new StringFormat($keyVault, $keyLoader);
+
+            $objectList->objects = array_filter($objectList->objects, function (T_Object $in) use ($filterMl, $filterSl) {
+                $in->content = $filterMl->decode($in->content);
+                $in->content = $filterSl->decode($in->content);
                 return $in;
             });
             $objectList->rev = $vcsRepository->getRev();
