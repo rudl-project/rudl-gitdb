@@ -57,7 +57,7 @@ AppLoader::extend(function (BraceApp $app) {
     $app->router->on("GET@/api/revision", function (VcsRepository $vcsRepository, State $state, BasicAuthToken $basicAuthToken) {
         $state->set(["update", $basicAuthToken->user, "last_rev"], date("Y-m-d H:i:s"));
 
-        return new Response\TextResponse($vcsRepository->getRev());
+        return new Response\TextResponse(substr($vcsRepository->getRev(), 0, 8));
     });
 
     $app->router->on("POST@/api/log", function (State $state, T_Log $body, BasicAuthToken $basicAuthToken) {
