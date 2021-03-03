@@ -20,6 +20,7 @@
         "brace/mod-router": "*",
         "brace/mod-firewall": "*",
         "brace/mod-body": "*",
+        "brace/uikit-bootstrap": "*",
         "rudl/gitdb-lib": "*",
         "rudl/vault": "dev-master",
         "phore/vcs": "*",

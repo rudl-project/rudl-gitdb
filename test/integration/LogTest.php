@@ -7,15 +7,13 @@ namespace Test;
 use PHPUnit\Framework\TestCase;
 use Rudl\LibGitDb\RudlGitDbClient;
 
-class GetRevisionTest extends TestCase
+class LogTest extends TestCase
 {
-
-    public function testGetRevision()
+    public function testWriteFiles()
     {
         $lib = new RudlGitDbClient();
         $lib->setEndpointDev("http://cert_issuer1:testtest@localhost");
-        $this->assertEquals(40, strlen ($lib->getRevision()));
+
+        $lib->logOk("Update successful");
     }
-
-
 }

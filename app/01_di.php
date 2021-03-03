@@ -21,6 +21,7 @@ use Phore\VCS\VcsFactory;
 use Rudl\GitDb\AccessChecker;
 use Rudl\GitDb\AccessCheckerMiddleware;
 use Rudl\GitDb\ObjectAccessor;
+use Rudl\GitDb\State;
 use Rudl\Vault\Lib\Config;
 use Rudl\Vault\Lib\KeyVault;
 
@@ -58,6 +59,11 @@ AppLoader::extend(function (BraceApp $app) {
         return $repo;
     }));
 
+
+    $app->define("state", new DiService(function () {
+        return new State();
+    }));
+
     $app->define("keyVault", new DiService(function () {
         $rudlVaultConfig = new Config();
         $rudlVaultConfig->load( DATA_PATH . "/.rudl-vault.json");
@@ -68,7 +74,5 @@ AppLoader::extend(function (BraceApp $app) {
     $app->define("accessChecker", new DiService(function (ObjectAccessor $objectAccessor) {
         return new AccessChecker($objectAccessor->loadConfig());
     }));
-
-
 
 });

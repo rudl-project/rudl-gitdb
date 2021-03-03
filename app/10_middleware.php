@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Brace\Assets\AssetsMiddleware;
+use Brace\Assets\AssetsModule;
 use Brace\Auth\Basic\AuthBasicMiddleware;
 use Brace\Auth\Basic\BasicAuthToken;
 use Brace\Body\BodyMiddleware;
@@ -17,6 +19,10 @@ use Brace\Router\RouterDispatchMiddleware;
 use Brace\Router\RouterEvalMiddleware;
 use Brace\Router\RouterModule;
 use Brace\Router\Type\RouteParams;
+use Brace\UiKit\Base\Template\UiKitPageReturnFormatter;
+use Brace\UiKit\Bootstrap\BootstrapConfig;
+use Brace\UiKit\Bootstrap\BootstrapModule;
+use Phore\Di\Container\Producer\DiService;
 use Psr\Http\Message\ServerRequestInterface;
 use Rudl\GitDb\AccessChecker;
 
@@ -30,7 +36,7 @@ AppLoader::extend(function (BraceApp $app) {
                 return false;
             },
             "@/hooks/repo" => function (AccessChecker $accessChecker, ConnectionInfo $connectionInfo, ServerRequestInterface $request) {
-                $token = $request->getQueryParams()["token"];
+                $token = $request->getQueryParams()["token"] ?? null;
                 if ($token === null)
                     throw new \InvalidArgumentException("Missing token query parameter ?token=");
                 $accessChecker->validateRepoHookToken($request->getQueryParams()["token"]);
@@ -47,6 +53,7 @@ AppLoader::extend(function (BraceApp $app) {
                 $accessChecker->validateSystem($basicAuthToken->user, $basicAuthToken->passwd);
                 return null; // Check next rules
             },
+            "POST@/api/log" => true,
             "@/api/revision" => true,
             "POST@/api/o/:scopeName" => function(AccessChecker $accessChecker, BasicAuthToken $basicAuthToken, RouteParams $routeParams) {
                 $accessChecker->validateWriteAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
@@ -55,17 +62,22 @@ AppLoader::extend(function (BraceApp $app) {
             "GET@/api/o/:scopeName" => function(AccessChecker $accessChecker, BasicAuthToken $basicAuthToken, RouteParams $routeParams) {
                 $accessChecker->validateReadAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
                 return true;
-            }
+            },
+            "@/" => true,
+            "@/state.json" => true
         ]
     );
+
 
     $app->setPipe([
         new ExceptionHandlerMiddleware(),
         new RouterEvalMiddleware(),
         new AuthBasicMiddleware(),
         new BodyMiddleware(),
+        new AssetsMiddleware(["/assets/"]),
         $firewall,
         new RouterDispatchMiddleware([
+            new UiKitPageReturnFormatter($app, "bootstrapConfig"),
             new JsonReturnFormatter($app)
         ]),
         new NotFoundMiddleware()

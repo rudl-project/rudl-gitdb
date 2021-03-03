@@ -9,6 +9,8 @@ use Laminas\Diactoros\Response;
 use Phore\VCS\VcsRepository;
 use Psr\Http\Message\RequestInterface;
 use Rudl\GitDb\ObjectAccessor;
+use Rudl\GitDb\State;
+use Rudl\LibGitDb\Type\Transport\T_Log;
 use Rudl\LibGitDb\Type\Transport\T_Object;
 use Rudl\LibGitDb\Type\Transport\T_ObjectList;
 use Rudl\Vault\Lib\Config;
@@ -52,8 +54,17 @@ AppLoader::extend(function (BraceApp $app) {
         return ["success" => true, "msg" => "update triggered"];
     });
 
-    $app->router->on("GET@/api/revision", function (VcsRepository $vcsRepository) {
+    $app->router->on("GET@/api/revision", function (VcsRepository $vcsRepository, State $state, BasicAuthToken $basicAuthToken) {
+        $state->set(["update", $basicAuthToken->user, "last_rev"], date("Y-m-d H:i:s"));
+
         return new Response\TextResponse($vcsRepository->getRev());
+    });
+
+    $app->router->on("POST@/api/log", function (State $state, T_Log $body, BasicAuthToken $basicAuthToken) {
+        $state->set(["update", $basicAuthToken->user, "last_log"], date ("Y-m-d H:i:s"));
+        $state->set(["update", $basicAuthToken->user, "last_log_type"], $body->type);
+        $state->set(["update", $basicAuthToken->user, "last_log_msg"], $body->msg);
+        return ["success" => true, "msg" => "logged"];
     });
 
     $app->router->on(
