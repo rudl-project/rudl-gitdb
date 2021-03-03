@@ -14,6 +14,6 @@ class LogTest extends TestCase
         $lib = new RudlGitDbClient();
         $lib->setEndpointDev("http://cert_issuer1:testtest@localhost");
 
-        $lib->logOk("Update successful");
+        $lib->logError("Update successful");
     }
 }
