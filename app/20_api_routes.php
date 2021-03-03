@@ -44,7 +44,7 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on("GET|POST@/hooks/trigger", function (VcsRepository $vcsRepository, string $body) {
         phore_dir($vcsRepository->getLocalRepoPath())->withFileName("trigger_last.yml")->set_yaml([
-            "date" => date("Y-m-d H:i:s"),
+            "date" => (new \DateTime())->format(\DateTime::ATOM),
             "body" => $body
         ]);
         $vcsRepository->commit("Trigger pulled.");

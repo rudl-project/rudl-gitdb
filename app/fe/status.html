@@ -12,7 +12,10 @@
             window.setInterval(() => {
                 $scope.$fn.update();
             }, 10000);
-
+            window.setInterval(
+                () => self.render(),
+                1000
+            )
         })(KaTpl.self);
     </script>
     <table class="table ">
@@ -26,8 +29,8 @@
         </thead>
         <tbody *if="typeof state.update !== 'undefined'">
             <tr  *for="let clientId in state.update" [classlist.table-success]="state.update[clientId].last_log_type === 'success'" [classlist.table-danger]="state.update[clientId].last_log_type !== 'success'" >
-                <td>{{ clientId }}</td>
-                <td>{{ state.update[clientId].last_rev }}</td>
+                <td><b>{{ clientId }}</b></td>
+                <td>+{{ parseInt(((Date.now() - Date.parse(state.update[clientId].last_rev)) / 1000)) }} [sec] </td>
                 <td>{{ state.update[clientId].last_log }}</td>
                 <td>{{ state.update[clientId].last_log_msg }}</td>
             </tr>

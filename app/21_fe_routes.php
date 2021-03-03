@@ -22,7 +22,9 @@ use Rudl\Vault\Lib\KeyVault;
 AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on("GET@/state.json", function (State $state) {
-        return $state->get();
+        $data = $state->get();
+        $data["now"] = (new \DateTime())->format(\DateTime::ATOM);
+        return $data;
     });
 
     $app->router->on("GET@/", fn() => BootstrapUiPage::createPageWithNavbar()->loadHtml(__DIR__ . "/fe/status.html"));
