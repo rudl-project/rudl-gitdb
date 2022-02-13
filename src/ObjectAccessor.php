@@ -30,7 +30,9 @@ class ObjectAccessor
             return new T_ObjectList();
         $scopeDir = $scopeDir->assertDirectory();
 
-        foreach ($scopeDir->genWalk() as $file) {
+        foreach ($scopeDir->genWalk(null, true) as $file) {
+            if ( ! $file->isFile())
+                continue;
             $fileList[] = $file;
         }
 
