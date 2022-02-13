@@ -25,5 +25,4 @@ class WriteObjectsTest extends TestCase
         $lib->writeObjects("certs", $objectList);
     }
 
-
 }
