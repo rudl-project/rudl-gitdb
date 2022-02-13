@@ -10,13 +10,20 @@ class State
 
     private $data = [];
 
+    /**
+     * @var \Phore\FileSystem\PhoreFile
+     */
+    private $stateFile;
+
     public function __construct(
         private string $fileName = "/tmp/gitdb-status.ser"
     )
     {
-        if ( ! file_exists($this->fileName))
-            file_put_contents($this->fileName, serialize([]));
-        $this->data = unserialize(file_get_contents($this->fileName));
+        $this->stateFile = phore_file($this->fileName);
+
+        if ( ! $this->stateFile->exists())
+            $this->stateFile->set_serialized([]);
+        $this->data = $this->stateFile->get_serialized([]);
     }
 
     public function &get(array $path = []) : array

@@ -26,7 +26,8 @@ use Rudl\Vault\Lib\Config;
 use Rudl\Vault\Lib\KeyVault;
 
 
-AppLoader::extend(function (BraceApp $app) {
+AppLoader::extend(function () {
+    $app = new BraceApp();
     $app->addModule(new BraceRequestLaminasModule());
     $app->addModule(new ConnectionInfoModule());
     $app->addModule(new RouterModule());
@@ -74,5 +75,5 @@ AppLoader::extend(function (BraceApp $app) {
     $app->define("accessChecker", new DiService(function (ObjectAccessor $objectAccessor) {
         return new AccessChecker($objectAccessor->loadConfig());
     }));
-
+    return $app;
 });

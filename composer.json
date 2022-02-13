@@ -47,5 +47,8 @@
     "extra": {
         "branch-alias": {
         }
+    },
+    "config": {
+        "preferred-install": "source"
     }
 }
