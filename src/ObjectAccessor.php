@@ -25,7 +25,7 @@ class ObjectAccessor
     public function getObjectList($scope) : T_ObjectList
     {
         $fileList = [];
-        $scopeDir = $this->rootDir->withSubPath($scope);
+        $scopeDir = phore_dir((string)$this->rootDir->withSubPath($scope));
         if ( ! $scopeDir->exists())
             return new T_ObjectList();
         $scopeDir = $scopeDir->assertDirectory();

@@ -16,6 +16,7 @@ class ReadObjectsTest extends TestCase
         $lib->setEndpointDev("http://cert_issuer1:testtest@localhost");
 
         $objectsList = $lib->listObjects("ssl_certs");
+        print_r ($objectsList);
     }
 
 }
