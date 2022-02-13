@@ -23,7 +23,7 @@ class State
 
         if ( ! $this->stateFile->exists())
             $this->stateFile->set_serialized([]);
-        $this->data = $this->stateFile->get_serialized([]);
+        $this->data = $this->stateFile->get_serialized();
     }
 
     public function &get(array $path = []) : array
@@ -52,6 +52,6 @@ class State
 
     public function __destruct()
     {
-        file_put_contents($this->fileName, serialize($this->data));
+        $this->stateFile->set_serialized($this->data);
     }
 }

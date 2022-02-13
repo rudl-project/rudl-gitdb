@@ -50,16 +50,19 @@ AppLoader::extend(function (BraceApp $app) {
                 return true;
             },
             "@/api/*" => function (AccessChecker $accessChecker, BasicAuthToken $basicAuthToken) {
+                $basicAuthToken->validate();
                 $accessChecker->validateSystem($basicAuthToken->user, $basicAuthToken->passwd);
                 return null; // Check next rules
             },
             "POST@/api/log" => true,
             "@/api/revision" => true,
             "POST@/api/o/:scopeName" => function(AccessChecker $accessChecker, BasicAuthToken $basicAuthToken, RouteParams $routeParams) {
+                $basicAuthToken->validate();
                 $accessChecker->validateWriteAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
                 return true;
             },
             "GET@/api/o/:scopeName" => function(AccessChecker $accessChecker, BasicAuthToken $basicAuthToken, RouteParams $routeParams) {
+                $basicAuthToken->validate();
                 $accessChecker->validateReadAccess($basicAuthToken->user, $basicAuthToken->passwd, $routeParams->get("scopeName"));
                 return true;
             },
