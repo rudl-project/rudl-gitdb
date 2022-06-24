@@ -1,5 +1,5 @@
 FROM ghcr.io/nfra-project/kickstart-flavor-php:8.1
-ENV DEV_CONTAINER_NAME="your-project-name"
+ENV DEV_CONTAINER_NAME="micx-gitdb"
 ENV DATA_PATH="/data"
 
 ADD / /opt
