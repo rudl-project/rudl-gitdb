@@ -25,7 +25,8 @@
         "rudl/vault": "dev-master",
         "phore/vcs": "*",
         "phore/filesystem": "dev-master",
-        "phore/hydrator": "*"
+        "phore/hydrator": "*",
+        "brace/dbg": "dev-main"
     },
 
     "require-dev": {

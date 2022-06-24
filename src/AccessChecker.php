@@ -38,6 +38,7 @@ class AccessChecker
 
     public function validateSystem(string $clientId, string $clientSecret) : void
     {
+
         $clientConfig = $this->getClientConfig($clientId);
         foreach ($clientConfig->accessKeysHash as $hash) {
             if (password_verify($clientSecret, $hash)) {

@@ -10,6 +10,7 @@ use Brace\Core\Base\ExceptionHandlerMiddleware;
 use Brace\Core\Base\JsonReturnFormatter;
 use Brace\Core\Base\NotFoundMiddleware;
 use Brace\Core\BraceApp;
+use Brace\Dbg\BraceDbg;
 use Brace\Mod\Request\Zend\BraceRequestLaminasModule;
 use Brace\Router\RouterDispatchMiddleware;
 use Brace\Router\RouterEvalMiddleware;
@@ -25,6 +26,7 @@ use Rudl\GitDb\State;
 use Rudl\Vault\Lib\Config;
 use Rudl\Vault\Lib\KeyVault;
 
+BraceDbg::SetupEnvironment(true, ["192.168.178.20", "localhost", "localhost:8080", "formmailer.srv.infracamp.org"]);
 
 AppLoader::extend(function () {
     $app = new BraceApp();
