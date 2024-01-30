@@ -7,6 +7,9 @@ Rudl GitDb Microservice
 
 ***/hooks/repo/push
 
+***/hooks/trigger?token=<triggerToken>***
+Trigger a update on project repository update
+
 
 ## Configuration
 
