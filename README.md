@@ -21,4 +21,3 @@ Trigger a update on project repository update
 | RUDL_VAULT_SECRET     | The secret to open the vault. (or file:/path/to/secret_file) |
 
 
-
