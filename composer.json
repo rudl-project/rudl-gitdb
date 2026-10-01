@@ -22,9 +22,9 @@
         "brace/mod-body": "*",
         "brace/uikit-bootstrap": "*",
         "rudl/gitdb-lib": "*",
-        "rudl/vault": "dev-master",
+        "rudl/vault": "*",
         "phore/vcs": "*",
-        "phore/filesystem": "dev-master",
+        "phore/filesystem": "*",
         "phore/hydrator": "*",
         "brace/dbg": "dev-main"
     },
