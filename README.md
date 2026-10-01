@@ -11,7 +11,6 @@ Trigger a update on project repository update
 
 ## Configuration
 
-
 ### Environment Variables
 
 | Name                  | Default      | Description     |
